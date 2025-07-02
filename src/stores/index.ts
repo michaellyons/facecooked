@@ -1,7 +1,37 @@
+import { useAssetsStore } from './modules/assets'
+import { useVideoStore } from './modules/video'
+import { useFaceDetectionStore } from './modules/faceDetection'
+
+// Export stores
 export { useAssetsStore } from './modules/assets'
 export { useVideoStore } from './modules/video'
-export { useFaceDetectionStore, type DetectedFace, type Character } from './modules/faceDetection'
-export type { CaptureShot, ProcessingOptions } from './modules/faceDetection'
+export { useFaceDetectionStore } from './modules/faceDetection'
+
+// Re-export shared types from centralized location
+export type {
+  DetectedFace,
+  Character,
+  CaptureShot,
+  ProcessingOptions,
+  VideoFrame,
+  Asset,
+  ModelGroup,
+  ModelSelection,
+  AssetType,
+  ModelCapability,
+  ViewState,
+  ComponentWithSeekTime,
+  ComponentWithFaceClick,
+  ComponentWithFrameSelect,
+  ApiResponse,
+  DraggedFace,
+  UIFaceGroup,
+  DragState,
+  Nullable,
+  Optional,
+  ID,
+  Timestamp
+} from '../types'
 
 // Store initialization utility
 export const initializeStores = () => {

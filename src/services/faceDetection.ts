@@ -1,41 +1,12 @@
 import * as faceapi from 'face-api.js'
+import type { BaseFace, ProcessingOptions, BaseCaptureShot } from '../types'
+export * from '../types'
 
-export interface DetectedFace {
-  id: string
-  box: {
-    x: number
-    y: number
-    width: number
-    height: number
-  }
-  confidence: number
-  landmarks?: Array<{ x: number; y: number }>
-  descriptor?: Float32Array
-  expressions?: {
-    expression: string
-    probability: number
-  }[]
-  age?: number
-  gender?: string
-}
+// Re-export the base face type as DetectedFace for compatibility
+export type DetectedFace = BaseFace
+export type { ProcessingOptions, BaseCaptureShot as CaptureShot } from '../types'
 
-export interface ProcessingOptions {
-  detectFaces: boolean
-  detectLandmarks: boolean
-  detectExpressions: boolean
-  detectAge: boolean
-  detectGender: boolean
-  recognizeFaces: boolean
-}
-
-export interface CaptureShot {
-  id: string
-  timestamp: number
-  dataUrl: string
-  blob?: Blob
-  width: number
-  height: number
-}
+// Remove FaceApiDetection type, as it causes type errors with face-api.js return types
 
 class FaceDetectionService {
   private modelsLoaded = false
@@ -77,7 +48,7 @@ class FaceDetectionService {
   }
 
   async detectFaces(
-    capture: CaptureShot, 
+    capture: BaseCaptureShot, 
     options: ProcessingOptions
   ): Promise<DetectedFace[]> {
     if (!this.modelsLoaded) {
@@ -89,7 +60,8 @@ class FaceDetectionService {
       const img = await this.createImageFromDataUrl(capture.dataUrl)
       
       // Execute detection pipeline based on options
-      let detections: any[]
+      // @eslint-disable-next-line
+      let detections: any[] // Use 'any[]' to accommodate all face-api.js result types
 
       if (options.recognizeFaces) {
         // Full pipeline with face descriptors for recognition
@@ -116,26 +88,30 @@ class FaceDetectionService {
           .withFaceExpressions()
       } else {
         // Faces only
-        detections = await faceapi
+        // Patch: wrap FaceDetection objects to have a .detection property for downstream code
+        const rawDetections = await faceapi
           .detectAllFaces(img, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+        detections = rawDetections.map((d: any) => ({ detection: d }))
       }
 
       // Convert face-api.js results to our format
-      const faces: DetectedFace[] = detections.map((detection: any, index: number) => {
+      const faces: DetectedFace[] = detections.map((detection, index) => {
+        // Ensure detection.detection exists (for faces-only case)
+        const det = detection.detection ? detection.detection : detection
         const face: DetectedFace = {
           id: `face_${capture.id}_${index}_${Date.now()}`,
           box: {
-            x: detection.detection.box.x,
-            y: detection.detection.box.y,
-            width: detection.detection.box.width,
-            height: detection.detection.box.height
+            x: det.box.x,
+            y: det.box.y,
+            width: det.box.width,
+            height: det.box.height
           },
-          confidence: detection.detection.score
+          confidence: det.score
         }
 
         // Add landmarks if available
-        if (detection.landmarks && detection.landmarks.positions) {
-          face.landmarks = detection.landmarks.positions.map((point: any) => ({
+        if (detection.landmarks && Array.isArray(detection.landmarks.positions)) {
+          face.landmarks = detection.landmarks.positions.map((point: { x: number; y: number }) => ({
             x: point.x,
             y: point.y
           }))
@@ -152,9 +128,11 @@ class FaceDetectionService {
         }
 
         // Add age/gender if available
-        if (detection.age !== undefined && detection.gender !== undefined) {
-          face.age = Math.round(Number(detection.age))
-          face.gender = String(detection.gender)
+        if (typeof detection.age === 'number') {
+          face.age = Math.round(detection.age)
+        }
+        if (typeof detection.gender === 'string') {
+          face.gender = detection.gender
         }
 
         // Add face descriptor if available

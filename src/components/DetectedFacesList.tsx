@@ -12,7 +12,6 @@ export function DetectedFacesList({ onSeekToTime }: DetectedFacesListProps) {
   const {
     getActiveFaces,
     getDeletedFaces,
-    captureShots,
     softDeleteFace,
     permanentDeleteFace,
     restoreFace,

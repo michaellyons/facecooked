@@ -40,7 +40,6 @@ export function VideoAnalysisInterface() {
     showFrameInfo,
     setIsPlaying,
     setCurrentTime,
-    setDuration,
     setVolume,
     setFrameRate,
     nextFrame,
@@ -55,10 +54,8 @@ export function VideoAnalysisInterface() {
     error,
     isProcessing,
     loadFaceApiModels,
-    getCaptureById 
   } = useFaceDetectionStore()
 
-  const [isFullscreen, setIsFullscreen] = useState(false)
   const [leftPanelView, setLeftPanelView] = useState<'characters' | 'faces'>('characters')
 
   // Auto-load models when component mounts

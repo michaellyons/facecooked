@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useAssetsStore, FACE_API_MODELS, type ModelCapability } from '../stores/modules/assets'
+import { useAssetsStore, FACE_API_MODELS } from '../stores/modules/assets'
+import type { ModelCapability, ModelSelection } from '../types'
 import { 
   Brain, 
   Eye, 
@@ -9,7 +10,6 @@ import {
   Zap, 
   CheckCircle, 
   Circle, 
-  Settings,
   ChevronDown,
   ChevronUp,
   Info,
@@ -17,12 +17,12 @@ import {
   Gauge
 } from 'lucide-react'
 
-const CAPABILITY_ICONS = {
+const CAPABILITY_ICONS: Record<ModelCapability, typeof Target> = {
   detection: Target,
   landmarks: Eye,
   recognition: Brain,
   analysis: Activity
-} as const
+}
 
 const PERFORMANCE_COLORS = {
   'very-high': 'text-green-500',
@@ -49,9 +49,7 @@ export function ModelSelectionPanel({ isOpen, onToggle }: ModelSelectionPanelPro
     availableCapabilities,
     selectedModels,
     setSelectedModel,
-    getSelectedModelOptions,
-    getLoadedModelsByCapability,
-    getAssetById
+    getLoadedModelsByCapability
   } = useAssetsStore()
 
   const [expandedGroups, setExpandedGroups] = useState<Set<ModelCapability>>(new Set(['detection']))
@@ -123,7 +121,7 @@ export function ModelSelectionPanel({ isOpen, onToggle }: ModelSelectionPanelPro
             const isAvailable = availableCapabilities.includes(capability)
             const isExpanded = expandedGroups.has(capability)
             const loadedModels = getLoadedModelsByCapability(capability)
-            const selectedModelId = selectedModels[capability]
+            const selectedModelId = selectedModels[capability as keyof ModelSelection]
 
             return (
               <div
@@ -270,7 +268,7 @@ export function ModelSelectionPanel({ isOpen, onToggle }: ModelSelectionPanelPro
           <div className="space-y-2">
             {Object.entries(selectedModels).map(([capabilityKey, modelId]) => {
               const capability = capabilityKey as ModelCapability
-              const group = modelGroups[capability]
+              const group = modelGroups[capability as keyof typeof modelGroups]
               const modelInfo = modelId ? getModelInfo(modelId) : null
               const isAvailable = availableCapabilities.includes(capability)
 

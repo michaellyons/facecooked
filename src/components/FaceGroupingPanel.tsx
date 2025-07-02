@@ -1,6 +1,5 @@
-import React, { useState, useCallback, useRef } from 'react'
-import { useFaceDetectionStore } from '../stores/modules/faceDetection'
-import type { DetectedFace } from '../stores/modules/faceDetection'
+import React, { useState, useCallback } from 'react'
+import { useFaceDetectionStore, type DetectedFace } from '../stores'
 import { Users, User, Plus, X, Play } from 'lucide-react'
 
 interface UIFaceGroup {

@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react'
 import { useFaceDetectionStore, type Character, type DetectedFace } from '../stores'
 import { 
   User, 
-  Users, 
   Edit2, 
   Trash2, 
   ChevronDown, 
   ChevronUp, 
   Plus,
-  Eye,
   Save,
   X,
   AlertTriangle,
@@ -38,11 +36,9 @@ function CharacterCard({
   character,
   isEditing,
   isSelected,
-  editingCharacterId,
   newCharacterName,
   openDropdownId,
   onSelectCharacter,
-  onEditName,
   onSaveCharacterName,
   onCancelEdit,
   onDeleteCharacter,
@@ -58,11 +54,9 @@ function CharacterCard({
   character: Character
   isEditing: boolean
   isSelected: boolean
-  editingCharacterId: string | null
   newCharacterName: string
   openDropdownId: string | null
   onSelectCharacter: (id: string | null) => void
-  onEditName: (id: string, name: string) => void
   onSaveCharacterName: (id: string) => void
   onCancelEdit: () => void
   onDeleteCharacter: (id: string) => void
@@ -92,7 +86,7 @@ function CharacterCard({
   return (
     <div
       key={character.id}
-      ref={drop as any}
+      ref={drop as unknown as React.RefObject<HTMLDivElement>}
       className={`group border rounded-lg transition-all ${
         isSelected 
           ? 'border-blue-500 bg-gray-800 shadow-md' 
@@ -427,7 +421,6 @@ export function CharacterPanel({ onSeekToTime }: CharacterPanelProps) {
   const {
     characters,
     detectedFaces,
-    captureShots,
     selectedCharacterId,
     selectCharacter,
     createCharacter,
@@ -436,7 +429,6 @@ export function CharacterPanel({ onSeekToTime }: CharacterPanelProps) {
     deleteCharacterCompletely,
     removeFaceFromCharacter,
     assignFaceToCharacter,
-    getCharacterFaces,
     getCaptureById,
     totalActiveFaces,
     cleanupOrphanedData
@@ -491,17 +483,16 @@ export function CharacterPanel({ onSeekToTime }: CharacterPanelProps) {
       await updateCharacterName(characterId, newCharacterName.trim())
     }
     setEditingCharacterId(null)
-    setNewCharacterName('')
+    setNewCharacterName("")
   }
 
   const handleCancelEdit = () => {
     setEditingCharacterId(null)
-    setNewCharacterName('')
+    setNewCharacterName("")
   }
 
   const handleDeleteCharacter = (characterId: string) => {
     deleteCharacter(characterId)
-    // Cleanup orphaned data
     setTimeout(() => cleanupOrphanedData(), 100)
   }
 
@@ -576,11 +567,9 @@ export function CharacterPanel({ onSeekToTime }: CharacterPanelProps) {
             character={character}
             isEditing={editingCharacterId === character.id}
             isSelected={selectedCharacterId === character.id}
-            editingCharacterId={editingCharacterId}
             newCharacterName={newCharacterName}
             openDropdownId={openDropdownId}
             onSelectCharacter={selectCharacter}
-            onEditName={(id, name) => updateCharacterName(id, name)}
             onSaveCharacterName={handleSaveCharacterName}
             onCancelEdit={handleCancelEdit}
             onDeleteCharacter={handleDeleteCharacter}
@@ -602,7 +591,7 @@ export function CharacterPanel({ onSeekToTime }: CharacterPanelProps) {
           <div className="mb-3">
             <h4 className="text-md font-medium text-white mb-1">Unassigned Faces</h4>
             <p className="text-xs text-gray-400">
-              Drag faces onto character cards to assign them, or click "New Character" to create one
+              {`Drag faces onto character cards to assign them, or click "New Character" to create one`}
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2">

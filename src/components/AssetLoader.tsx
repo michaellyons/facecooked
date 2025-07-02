@@ -1,7 +1,8 @@
 'use client'
 
 import { useAssetsStore } from '../stores'
-import { MODEL_GROUPS, type ModelCapability } from '../stores/modules/assets'
+// MODEL_GROUPS removed as it's not used in this component
+import type { ModelCapability } from '../types'
 import { useState, useEffect } from 'react'
 
 export function AssetLoader() {
@@ -13,17 +14,12 @@ export function AssetLoader() {
     modelGroups,
     availableCapabilities,
     loadAllAssets,
-    loadFaceApiModels,
-    loadModelsByCapability,
-    resetAssets,
     getLoadedAssets,
     getFailedAssets,
-    getAvailableFeatures,
-    isCapabilityAvailable
+    getAvailableFeatures
   } = useAssetsStore()
 
   const [showDetails, setShowDetails] = useState(false)
-  const [selectedCapabilities, setSelectedCapabilities] = useState<ModelCapability[]>([])
   const [isComplete, setIsComplete] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
 
@@ -72,31 +68,7 @@ export function AssetLoader() {
     }
   }
 
-  const handleLoadModelsOnly = async () => {
-    try {
-      await loadFaceApiModels()
-    } catch (error) {
-      console.error('Failed to load face-api models:', error)
-    }
-  }
-
-  const handleLoadByCapability = async () => {
-    if (selectedCapabilities.length === 0) return
-    
-    try {
-      await loadModelsByCapability(selectedCapabilities)
-    } catch (error) {
-      console.error('Failed to load models by capability:', error)
-    }
-  }
-
-  const toggleCapability = (capability: ModelCapability) => {
-    setSelectedCapabilities(prev => 
-      prev.includes(capability) 
-        ? prev.filter(cap => cap !== capability)
-        : [...prev, capability]
-    )
-  }
+  // Removed unused functions: handleLoadModelsOnly, handleLoadByCapability, toggleCapability
 
   const getCapabilityIcon = (capability: ModelCapability) => {
     const icons: Record<ModelCapability, string> = {
@@ -294,12 +266,6 @@ export function AssetLoader() {
                 className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors text-sm"
               >
                 🚀 Load All
-              </button>
-              <button
-                onClick={resetAssets}
-                className="px-4 py-2 bg-gray-600 text-gray-300 rounded hover:bg-gray-500 transition-colors text-sm"
-              >
-                Reset
               </button>
             </div>
           </div>

@@ -1,29 +1,21 @@
 import { toast } from 'sonner'
 import type { DetectedFace, Character, CaptureShot } from '../stores'
+import type { ApiResponse, ProcessingOptions } from '../types'
 
 // Simulated API delay
 const API_DELAY = 800 + Math.random() * 400 // 800-1200ms
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-// Simulated API responses
-interface ApiResponse<T = any> {
-  success: boolean
-  data?: T
-  message?: string
-  timestamp: string
-}
-
 class ApiService {
   private baseUrl = 'https://api.facecooked.com/v1' // Simulated API endpoint
 
   // Helper to create consistent API responses
-  private createResponse<T>(data: T, message?: string): ApiResponse<T> {
+  private createResponse<T>(data: T): ApiResponse<T> {
     return {
       success: true,
       data,
-      message,
-      timestamp: new Date().toISOString()
+      timestamp: Date.now()
     }
   }
 
@@ -52,7 +44,7 @@ class ApiService {
       duration: 4000
     })
 
-    return this.createResponse(character, 'Character created successfully')
+    return this.createResponse(character)
   }
 
   async updateCharacter(characterId: string, updates: Partial<Character>): Promise<ApiResponse<Character>> {
@@ -72,7 +64,7 @@ class ApiService {
     return this.createResponse({ ...updates, id: characterId } as Character)
   }
 
-  async deleteCharacter(characterId: string, permanent: boolean = false): Promise<ApiResponse> {
+  async deleteCharacter(characterId: string, permanent: boolean = false): Promise<ApiResponse<null>> {
     console.group(`🗑️ API Call: ${permanent ? 'Permanently Delete' : 'Delete'} Character`)
     console.log('Endpoint:', `${this.baseUrl}/characters/${characterId}`)
     console.log('Method:', 'DELETE')
@@ -94,7 +86,7 @@ class ApiService {
       })
     }
 
-    return this.createResponse(null, 'Character deleted successfully')
+    return this.createResponse(null)
   }
 
   // Face Management APIs
@@ -127,7 +119,7 @@ class ApiService {
     return this.createResponse({ ...updates, id: faceId } as DetectedFace)
   }
 
-  async deleteFace(faceId: string, permanent: boolean = false): Promise<ApiResponse> {
+  async deleteFace(faceId: string, permanent: boolean = false): Promise<ApiResponse<null>> {
     console.group(`🚫 API Call: ${permanent ? 'Permanently Delete' : 'Hide'} Face`)
     console.log('Endpoint:', `${this.baseUrl}/faces/${faceId}`)
     console.log('Method:', 'DELETE')
@@ -149,7 +141,7 @@ class ApiService {
       })
     }
 
-    return this.createResponse(null, 'Face deleted successfully')
+    return this.createResponse(null)
   }
 
   async restoreFace(faceId: string): Promise<ApiResponse<DetectedFace>> {
@@ -218,7 +210,10 @@ class ApiService {
   }
 
   // Face Detection APIs
-  async processFaceDetection(captureId: string, options: any): Promise<ApiResponse<DetectedFace[]>> {
+  async processFaceDetection(
+    captureId: string,
+    options: ProcessingOptions
+  ): Promise<ApiResponse<DetectedFace[]>> {
     console.group('🤖 API Call: Process Face Detection')
     console.log('Endpoint:', `${this.baseUrl}/detection/process`)
     console.log('Method:', 'POST')
@@ -247,11 +242,11 @@ class ApiService {
       duration: 4000
     })
 
-    return this.createResponse([], 'Face detection completed')
+    return this.createResponse([])
   }
 
   // Analytics APIs
-  async syncAnalytics(stats: any, toastId?: string): Promise<ApiResponse> {
+  async syncAnalytics(stats: Record<string, unknown>, toastId?: string): Promise<ApiResponse<null>> {
     console.group('📊 API Call: Sync Analytics')
     console.log('Endpoint:', `${this.baseUrl}/analytics/sync`)
     console.log('Method:', 'POST')
@@ -267,11 +262,14 @@ class ApiService {
       duration: 4000
     })
 
-    return this.createResponse(null, 'Analytics synced successfully')
+    return this.createResponse(null)
   }
 
   // Bulk Operations
-  async bulkUpdateFaces(updates: { faceId: string, updates: Partial<DetectedFace> }[], toastId?: string): Promise<ApiResponse> {
+  async bulkUpdateFaces(
+    updates: { faceId: string, updates: Partial<DetectedFace> }[],
+    toastId?: string
+  ): Promise<ApiResponse<null>> {
     console.group('📦 API Call: Bulk Update Faces')
     console.log('Endpoint:', `${this.baseUrl}/faces/bulk-update`)
     console.log('Method:', 'POST')
@@ -292,7 +290,7 @@ class ApiService {
       duration: 4000
     })
 
-    return this.createResponse(null, 'Bulk update completed')
+    return this.createResponse(null)
   }
 }
 

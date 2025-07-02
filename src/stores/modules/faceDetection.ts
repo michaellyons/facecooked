@@ -1,40 +1,17 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { faceDetectionService } from '../../services/faceDetection'
-import type { DetectedFace as ServiceDetectedFace, ProcessingOptions } from '../../services/faceDetection'
 import { apiService } from '../../services/api'
+import type { 
+  DetectedFace, 
+  Character, 
+  CaptureShot, 
+  ProcessingOptions,
+  BaseFace 
+} from '../../types'
 
-// Enhanced DetectedFace with soft delete and character info
-export interface DetectedFace extends ServiceDetectedFace {
-  deleted_at?: number // Timestamp when face was deleted
-  capture_id: string // Reference to which capture this face belongs to
-  character_name?: string // User-assigned character name
-  character_id?: string // Unique character identifier for grouping faces
-}
-
-export interface Character {
-  id: string
-  name: string
-  face_count: number
-  first_seen: number // timestamp
-  last_seen: number // timestamp
-  representative_face?: DetectedFace // Best quality face for this character
-  confidence: number // Average confidence across all faces
-}
-
-export interface CaptureShot {
-  id: string
-  timestamp: number
-  dataUrl: string
-  blob?: Blob
-  width: number
-  height: number
-  detectedFaces: DetectedFace[]
-  isProcessing: boolean
-  isProcessed: boolean
-  error?: string
-  speakerId?: string
-}
+// Re-export types for compatibility
+export type { DetectedFace, Character, CaptureShot } from '../../types'
 
 export interface FaceDetectionState {
   // Capture management
@@ -118,7 +95,7 @@ export interface FaceDetectionState {
   getFacesForCapture: (captureId: string) => DetectedFace[]
   getActiveFaces: () => DetectedFace[]
   getDeletedFaces: () => DetectedFace[]
-  isDuplicateFace: (face: ServiceDetectedFace, captureId: string) => boolean
+  isDuplicateFace: (face: BaseFace, captureId: string) => boolean
 }
 
 export const useFaceDetectionStore = create<FaceDetectionState>()(
@@ -290,7 +267,7 @@ export const useFaceDetectionStore = create<FaceDetectionState>()(
         }
       },
 
-      isDuplicateFace: (face: ServiceDetectedFace, captureId: string) => {
+      isDuplicateFace: (face: BaseFace, captureId: string) => {
         const { deletedFaceIds, detectedFaces, deletedFaceDescriptors } = get()
         
         // Check if this exact face ID was already deleted
@@ -318,7 +295,7 @@ export const useFaceDetectionStore = create<FaceDetectionState>()(
           
           for (const [deletedId, deletedDescriptor] of deletedFaceDescriptors) {
             const distance = Math.sqrt(
-              face.descriptor.reduce((sum, val, i) => 
+              face.descriptor.reduce((sum: number, val: number, i: number) => 
                 sum + Math.pow(val - deletedDescriptor[i], 2), 0
               )
             )

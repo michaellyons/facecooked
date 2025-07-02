@@ -5,18 +5,14 @@ import { useState, useEffect } from 'react'
 import { 
   Camera, 
   Settings, 
-  Check, 
   Trash2, 
-  Eye, 
   Play,
   Loader2,
   Search,
   Clock,
   AlertCircle,
   Target,
-  Users,
-  Cog,
-  X
+  Users
 } from 'lucide-react'
 
 interface FrameCaptureStackProps {
@@ -40,7 +36,7 @@ export function FrameCaptureStack({ onFrameSelect, onSeekToTime, onFaceClick }: 
     totalFaces
   } = useFaceDetectionStore()
 
-  const { currentTime, currentFrameNumber, frameRate } = useVideoStore()
+  const { currentTime } = useVideoStore()
 
   const [showProcessingOptions, setShowProcessingOptions] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ 
@@ -140,7 +136,7 @@ export function FrameCaptureStack({ onFrameSelect, onSeekToTime, onFaceClick }: 
         <Camera className="w-16 h-16 text-gray-400 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-gray-700 mb-3">No Frame Captures Yet</h3>
         <p className="text-sm text-gray-600 leading-relaxed">
-          Use the "Capture & Detect" button while watching your video to save frames for face detection analysis.
+        {`Use the "Capture & Detect" button while watching your video to save frames for face detection analysis.`}
         </p>
       </div>
     )

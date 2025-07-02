@@ -1,9 +1,8 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import type { AssetType, ModelCapability, ModelGroup, ModelSelection } from '../../types'
 
-// Asset types that can be preloaded
-export type AssetType = 'model' | 'video' | 'image' | 'svg'
-
+// Enhanced Asset interface for the store
 export interface Asset {
   id: string
   type: AssetType
@@ -12,19 +11,6 @@ export interface Asset {
   loading: boolean
   error?: string
   size?: number
-}
-
-// Model capability groupings
-export type ModelCapability = 'detection' | 'landmarks' | 'recognition' | 'analysis'
-
-export interface ModelGroup {
-  capability: ModelCapability
-  name: string
-  description: string
-  models: string[]
-  requiredModels: string[] // Minimum models needed for this capability
-  isAvailable: boolean
-  features: string[]
 }
 
 // Face-api.js model configurations with enhanced metadata
@@ -163,12 +149,10 @@ export const MODEL_GROUPS: Record<ModelCapability, ModelGroup> = {
   }
 }
 
-export interface ModelSelection {
-  detection: string
-  landmarks: string | null
-  recognition: string | null
-  analysis: string | null
-}
+// ModelSelection is now imported from shared types
+
+// Re-export types for compatibility
+export type { AssetType, ModelCapability, ModelGroup, ModelSelection } from '../../types'
 
 export interface AssetsState {
   assets: Record<string, Asset>

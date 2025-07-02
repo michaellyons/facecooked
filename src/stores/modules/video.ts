@@ -1,11 +1,6 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-
-export interface VideoFrame {
-  timestamp: number
-  dataUrl: string
-  blob?: Blob
-}
+import type { VideoFrame } from '../../types'
 
 export interface VideoState {
   // Video file management
