@@ -3,7 +3,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { useVideoStore, useFaceDetectionStore, useAssetsStore } from '../stores'
 import { FrameCaptureStack } from './FrameCaptureStack'
-import FaceGroupingPanel from './FaceGroupingPanel'
+import { CharacterPanel } from './CharacterPanel'
 import { ApiTestPanel } from './ApiTestPanel'
 import { ModelSelectionPanel } from './ModelSelectionPanel'
 import { AssetLoader } from './AssetLoader'
@@ -1043,7 +1043,7 @@ export function UnifiedInterface() {
           </div>
         </div>
         <div className="flex-1 overflow-hidden">
-          <FaceGroupingPanel onSeekToTime={handleSeekToTime} />
+          <CharacterPanel onSeekToTime={handleSeekToTime} />
         </div>
       </div>
     )
